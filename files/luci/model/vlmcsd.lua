@@ -1,11 +1,16 @@
-local m, s
+local m, s, Status
+
+local ver = luci.sys.exec("vlmcsd -V | awk '/built/{print $2}' | sed -n 's/,//p'")
 
 local running=(luci.sys.call("pidof vlmcsd > /dev/null") == 0)
-if running then	
-	m = Map("vlmcsd", translate("vlmcsd config"), translate("Vlmcsd is running."))
+
+if running then
+	Status = "<b><font color=\"green\">" .. translate("KMS Server is running.") .. "</font></b>"
 else
-	m = Map("vlmcsd", translate("vlmcsd config"), translate("Vlmcsd is not running."))
+	Status = "<b><font color=\"red\">" .. translate("KMS Server is stopped.") .. "</font></b>"
 end
+
+m = Map("vlmcsd", translate("KMS Server config"), translate("Current Version") .. ": " .. ver .. "<br /> " .. Status )
 
 s = m:section(TypedSection, "vlmcsd", "")
 s.addremove = false
@@ -24,7 +29,7 @@ autoactivate.rmempty = false
 
 config = s:option(Value, "config", translate("configfile"), translate("This file is /etc/vlmcsd.ini."), "")
 config.template = "cbi/tvalue"
-config.rows = 15
+config.rows = 20
 config.wrap = "off"
 
 function config.cfgvalue(self, section)
