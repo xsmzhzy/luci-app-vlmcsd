@@ -45,12 +45,11 @@ function enable.write(self, section, value)
 	if value == "1" then
 		luci.sys.call("/etc/init.d/vlmcsd enable >/dev/null")
 		luci.sys.call("/etc/init.d/vlmcsd start >/dev/null")
-		luci.sys.call("/etc/init.d/dnsmasq restart >/dev/null")
 	else
 		luci.sys.call("/etc/init.d/vlmcsd stop >/dev/null")
 		luci.sys.call("/etc/init.d/vlmcsd disable >/dev/null")
-		luci.sys.call("/etc/init.d/dnsmasq restart >/dev/null")
 	end
+	-- luci.sys.call("/etc/init.d/dnsmasq restart >/dev/null")
 	Flag.write(self, section, value)
 end
 
@@ -61,7 +60,16 @@ function autoactivate.write(self, section, value)
 	else
 		luci.sys.call("sed -i '/srv-host=_vlmcs._tcp.lan/d' /etc/dnsmasq.conf")
 	end
+	-- luci.sys.call("/etc/init.d/dnsmasq restart >/dev/null")
 	Flag.write(self, section, value)
+end
+
+
+local apply = luci.http.formvalue("cbi.apply")
+if apply then
+	-- do apply 
+	luci.sys.call("/etc/init.d/vlmcsd restart >/dev/null")
+	luci.sys.call("/etc/init.d/dnsmasq restart >/dev/null")
 end
 
 return m
