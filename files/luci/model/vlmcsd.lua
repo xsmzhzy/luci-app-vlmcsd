@@ -18,9 +18,10 @@ s.anonymous = true
 
 enable = s:option(Flag, "enabled", translate("Enable"))
 enable.rmempty = false
-function enable.cfgvalue(self, section)
-	return luci.sys.init.enabled("vlmcsd") and self.enabled or self.disabled
-end
+
+-- function enable.cfgvalue(self, section)
+--	return luci.sys.init.enabled("vlmcsd") and self.enabled or self.disabled
+-- end
 
 local hostname = luci.model.uci.cursor():get_first("system", "system", "hostname")
 
@@ -44,10 +45,10 @@ end
 function enable.write(self, section, value)
 	if value == "1" then
 		luci.sys.call("/etc/init.d/vlmcsd enable >/dev/null")
-		luci.sys.call("/etc/init.d/vlmcsd start >/dev/null")
+		-- luci.sys.call("/etc/init.d/vlmcsd start >/dev/null")
 	else
 		luci.sys.call("/etc/init.d/vlmcsd stop >/dev/null")
-		luci.sys.call("/etc/init.d/vlmcsd disable >/dev/null")
+		-- luci.sys.call("/etc/init.d/vlmcsd disable >/dev/null")
 	end
 	-- luci.sys.call("/etc/init.d/dnsmasq restart >/dev/null")
 	Flag.write(self, section, value)
@@ -68,7 +69,14 @@ end
 local apply = luci.http.formvalue("cbi.apply")
 if apply then
 	-- do apply 
-	luci.sys.call("/etc/init.d/vlmcsd restart >/dev/null")
+	local isEnabled=uci.get("vlmcsd", "config", "enabled")
+	if isEnabled == '1' then
+		luci.sys.call("/etc/init.d/vlmcsd enable >/dev/null")
+		luci.sys.call("/etc/init.d/vlmcsd start >/dev/null")
+	else
+		luci.sys.call("/etc/init.d/vlmcsd stop >/dev/null")
+		luci.sys.call("/etc/init.d/vlmcsd disable >/dev/null")
+	end
 	luci.sys.call("/etc/init.d/dnsmasq restart >/dev/null")
 end
 
