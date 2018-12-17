@@ -42,17 +42,17 @@ function config.write(self, section, value)
 	nixio.fs.writefile("/etc/vlmcsd.ini", value)
 end
 
-function enable.write(self, section, value)
-	if value == "1" then
-		luci.sys.call("/etc/init.d/vlmcsd enable >/dev/null")
-		-- luci.sys.call("/etc/init.d/vlmcsd start >/dev/null")
-	else
-		luci.sys.call("/etc/init.d/vlmcsd stop >/dev/null")
-		-- luci.sys.call("/etc/init.d/vlmcsd disable >/dev/null")
-	end
+--function enable.write(self, section, value)
+--	if value == "1" then
+--		luci.sys.exec("/etc/init.d/vlmcsd start >/dev/null")
+--		luci.sys.exec("/etc/init.d/vlmcsd enable >/dev/null")
+--	else
+--		luci.sys.exec("/etc/init.d/vlmcsd stop >/dev/null")
+--		luci.sys.exec("/etc/init.d/vlmcsd disable >/dev/null")
+--	end
 	-- luci.sys.call("/etc/init.d/dnsmasq restart >/dev/null")
-	Flag.write(self, section, value)
-end
+--	Flag.write(self, section, value)
+--end
 
 function autoactivate.write(self, section, value)
 	if value == "1" then
@@ -61,18 +61,39 @@ function autoactivate.write(self, section, value)
 	else
 		luci.sys.call("sed -i '/srv-host=_vlmcs._tcp.lan/d' /etc/dnsmasq.conf")
 	end
-	-- luci.sys.call("/etc/init.d/dnsmasq restart >/dev/null")
+	--luci.sys.exec("/etc/init.d/dnsmasq restart >/dev/null")
 	Flag.write(self, section, value)
 end
 
+-- Save
+local cbisave = luci.http.formvalue("cbi.save")
+if false then
+--if cbisave then
+        -- do save 
+        local x = luci.model.uci.cursor()
+        local isEnabled=luci.model.uci.cursor():get("vlmcsd", "config", "enabled")
+        -- local isEnabled=uci.get("vlmcsd", "config", "enabled")
+        if isEnabled == '1' then
+                luci.sys.call("/etc/init.d/vlmcsd enable >/dev/null")
+                luci.sys.call("/etc/init.d/vlmcsd start >/dev/null")
+        else
+                luci.sys.call("/etc/init.d/vlmcsd stop >/dev/null")
+                luci.sys.call("/etc/init.d/vlmcsd disable >/dev/null")
+        end
+        luci.sys.call("/etc/init.d/dnsmasq restart >/dev/null")
+end
 
+-- Apply & Save 
 local apply = luci.http.formvalue("cbi.apply")
+--if false then
 if apply then
-	-- do apply 
-	local isEnabled=uci.get("vlmcsd", "config", "enabled")
+	-- do apply
+	-- local x = luci.model.uci.cursor()
+	local isEnabled=luci.model.uci.cursor():get("vlmcsd", "config", "enabled") 
+	-- local isEnabled=uci.get("vlmcsd", "config", "enabled")
 	if isEnabled == '1' then
-		luci.sys.call("/etc/init.d/vlmcsd enable >/dev/null")
 		luci.sys.call("/etc/init.d/vlmcsd start >/dev/null")
+		luci.sys.call("/etc/init.d/vlmcsd enable >/dev/null")
 	else
 		luci.sys.call("/etc/init.d/vlmcsd stop >/dev/null")
 		luci.sys.call("/etc/init.d/vlmcsd disable >/dev/null")
