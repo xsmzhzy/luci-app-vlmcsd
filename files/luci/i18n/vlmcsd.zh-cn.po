@@ -28,7 +28,7 @@ msgid "configfile"
 msgstr "配置文件"
 
 msgid "This file is /etc/vlmcsd.ini."
-msgstr "这个文件是/etc/vlmcsd.ini, ，可以增加新的产品主密钥。"
+msgstr "这个文件是/etc/vlmcsd.ini, 可以增加新的产品主密钥。"
 
 msgid "Current Version"
 msgstr "当前版本"
